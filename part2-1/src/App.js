@@ -1,7 +1,15 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 
-const Countrie = ({ countries }) => {
+const Button = ({ handleClick, text }) => (
+  <button onClick={handleClick}>{text}</button>
+);
+
+const ShowButton = ({ handleClick }) => (
+  <Button handleClick={handleClick} text="show"></Button>
+);
+
+const Countrie = ({ countries, handleShowButtonClick }) => {
   if (countries.length > 10) {
     return <div>Too many countries pleace specify</div>;
   } else if (countries.length === 1) {
@@ -28,7 +36,12 @@ const Countrie = ({ countries }) => {
     return (
       <div>
         {countries.map((value) => (
-          <div key={value.name.common}>{value.name.common}</div>
+          <div key={value.name.common}>
+            {value.name.common}
+            <ShowButton
+              handleClick={() => handleShowButtonClick(value)}
+            ></ShowButton>
+          </div>
         ))}
       </div>
     );
@@ -51,6 +64,10 @@ function App() {
     setCountrisearch(event.target.value);
   };
 
+  const handleShowButtonClick = (countriToShow) => {
+    setCountrisearch(countriToShow.name.common);
+  };
+
   const countriesToShow = countries.filter((countrie) =>
     countrie.name.common.toLowerCase().includes(countriSearch.toLowerCase())
   );
@@ -66,7 +83,10 @@ function App() {
           ></input>
         </div>
       </form>
-      <Countrie countries={countriesToShow}></Countrie>
+      <Countrie
+        countries={countriesToShow}
+        handleShowButtonClick={handleShowButtonClick}
+      ></Countrie>
     </div>
   );
 }
