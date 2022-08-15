@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import Persons from "./components/Persons";
-import axios from "axios";
+import peopleService from "./Services/people";
+
+const Button = ({ handleClick, name }) => (
+  <button onClick={handleClick}>{name}</button>
+);
+
+const DeleteButton = ({ handleClick }) => (
+  <Button handleClick={handleClick} name={"delete"}></Button>
+);
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -9,8 +17,8 @@ const App = () => {
   const [personSearch, setPersonSearch] = useState("");
 
   const hook = () => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
+    peopleService.getAll().then((all) => {
+      setPersons(all);
     });
   };
 
@@ -29,9 +37,11 @@ const App = () => {
       alert(`${newName} is already added to the phonebook`);
       return;
     }
-    setPersons(persons.concat(personObject));
-    setNewName("");
-    setNewNumber("");
+    peopleService.create(personObject).then((updatedPeople) => {
+      setPersons(persons.concat(updatedPeople));
+      setNewName("");
+      setNewNumber("");
+    });
   };
 
   const handleNameChange = (event) => {
