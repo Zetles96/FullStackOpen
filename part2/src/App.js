@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Persons from "./components/Persons";
+import Notification from "./components/Notification";
 import peopleService from "./Services/people";
 
 const App = () => {
@@ -7,7 +8,8 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [personSearch, setPersonSearch] = useState("");
-
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [noteficationMessage, setNoteficationMessage] = useState(null);
   const hook = () => {
     peopleService.getAll().then((all) => {
       setPersons(all);
@@ -41,16 +43,29 @@ const App = () => {
           number: newNumber,
           name: pleb[0].name,
         };
-        peopleService.update(pleb[0].id, updatedpleb).then((updatedPeople) => {
-          const copyPersons = [...persons];
-          const index = copyPersons.findIndex(
-            (thing) => thing.id === pleb[0].id
-          );
-          copyPersons[index] = updatedPeople;
-          setPersons(copyPersons);
-          setNewName("");
-          setNewNumber("");
-        });
+        peopleService
+          .update(pleb[0].id, updatedpleb)
+          .then((updatedPeople) => {
+            const copyPersons = [...persons];
+            const index = copyPersons.findIndex(
+              (thing) => thing.id === pleb[0].id
+            );
+            copyPersons[index] = updatedPeople;
+            setPersons(copyPersons);
+            setNewName("");
+            setNewNumber("");
+            setNoteficationMessage(
+              `${personObject.name}s number was succesfully changed`
+            );
+            setTimeout(() => {
+              setNoteficationMessage(null);
+            }, 5000);
+          })
+          .catch((error) => {
+            setErrorMessage(
+              `${personObject.name} was already removed from the server`
+            );
+          });
       }
       return;
     }
@@ -58,6 +73,10 @@ const App = () => {
       setPersons(persons.concat(updatedPeople));
       setNewName("");
       setNewNumber("");
+      setNoteficationMessage(`${personObject.name} was succesfully added`);
+      setTimeout(() => {
+        setNoteficationMessage(null);
+      }, 5000);
     });
   };
 
@@ -84,7 +103,7 @@ const App = () => {
       window.confirm(`do you really want do delete ${person.name}`)
     ) {
       peopleService.deleteByid(personId).then(() => {
-        setPersons(persons.filter((person) => person.id !== person.id));
+        setPersons(persons.filter((person) => person.id !== personId));
       });
     }
   };
@@ -92,6 +111,12 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification.Notification
+        message={noteficationMessage}
+      ></Notification.Notification>
+      <Notification.ErrorNotification
+        message={errorMessage}
+      ></Notification.ErrorNotification>
       <form>
         <div>
           filter shown with:
