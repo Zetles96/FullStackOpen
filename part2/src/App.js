@@ -18,6 +18,17 @@ const App = () => {
 
   useEffect(hook, []);
 
+  // // componentDidMount
+  // useEffect(() => {}, []);
+
+  // // Everything input changes. run this effect
+  // useEffect(() => {}, [input]);
+
+  // // When the component is removed from the dom
+  // useEffect(() => {
+  //   return () => {};
+  // }, []);
+
   const addPerson = (event) => {
     event.preventDefault();
     const personObject = {
